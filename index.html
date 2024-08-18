@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Late Portal</title>
+</head>
+<body>
+    <h1>Student Late Portal</h1>
+
+    <h2>Register</h2>
+    <form id="registerForm">
+        <input type="text" id="username" placeholder="Username" required>
+        <select id="role">
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+        </select>
+        <button type="submit">Register</button>
+    </form>
+
+    <h2>Submit Late Entry</h2>
+    <form id="lateEntryForm">
+        <input type="text" id="userId" placeholder="User ID" required>
+        <input type="date" id="date" required>
+        <input type="text" id="reason" placeholder="Reason" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Late Entries</h2>
+    <button id="getEntriesBtn">Get Late Entries</button>
+    <ul id="lateEntries"></ul>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const role = document.getElementById('role').value;
+
+            const res = await fetch('http://localhost:3000/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, role })
+            });
+
+            const data = await res.json();
+            alert(`Registered with ID: ${data.id}`);
+        });
+
+        document.getElementById('lateEntryForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const user_id = document.getElementById('userId').value;
+            const date = document.getElementById('date').value;
+            const reason = document.getElementById('reason').value;
+
+            const res = await fetch('http://localhost:3000/late-entry', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id, date, reason })
+            });
+
+            const data = await res.json();
+            alert(`Late entry submitted with ID: ${data.id}`);
+        });
+
+        document.getElementById('getEntriesBtn').addEventListener('click', async function() {
+            const res = await fetch('http://localhost:3000/late-entries');
+            const data = await res.json();
+
+            const lateEntriesList = document.getElementById('lateEntries');
+            lateEntriesList.innerHTML = '';
+
+            data.forEach(entry => {
+                const li = document.createElement('li');
+                li.textContent = `User ID: ${entry.user_id}, Date: ${entry.date}, Reason: ${entry.reason}`;
+                lateEntriesList.appendChild(li);
+            });
+        });
+    </script>
+</body>
+</html>
